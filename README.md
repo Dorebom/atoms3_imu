@@ -4,16 +4,16 @@ M5Stack AtomS3 Liteを使って、IMUの姿勢推定データをバイナリでU
 
 (現状は、テキストデータで送信してる)
 
-M5Stack AtomS3 Liteのビルド環境は、SAITO Tetsuyaさんのコードを利用。
-https://github.com/3110/m5stack-platformio-boilerplate-code
+M5Stack AtomS3 Liteのビルド環境は、SAITO Tetsuyaさんのコードを利用。  
+https://github.com/3110/m5stack-platformio-boilerplate-code  
 MIT LICENCE
 
-UARTのパケットシリアライズは、Christopher Bakerさんのコードを利用。
-https://github.com/bakercp/PacketSerial
+UARTのパケットシリアライズは、Christopher Bakerさんのコードを利用。  
+https://github.com/bakercp/PacketSerial  
 MIT LICENCE
 
-姿勢推定は、arduino-librariesを利用。
-https://github.com/arduino-libraries/MadgwickAHRS
+姿勢推定は、arduino-librariesを利用。  
+https://github.com/arduino-libraries/MadgwickAHRS  
 LGPL LICENCE
 
 (ライセンス関連の記載もあとあと早い段階でちゃんとしたい)
