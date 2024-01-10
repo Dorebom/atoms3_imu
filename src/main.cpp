@@ -9,6 +9,11 @@
 #define BMP280_SENSOR_ADDR 0x76
 #define BMM150_SENSOR_ADDR 0x10
 
+#define NUM_LEDS     1
+#define LED_DATA_PIN 35
+
+CRGB leds[NUM_LEDS];
+
 Madgwick filter;
 
 BMI270::BMI270 bmi270;
@@ -20,6 +25,9 @@ void setup(void) {
     cfg.serial_baudrate = 115200;
 
     M5_BEGIN(cfg);
+
+    FastLED.addLeds<WS2811, LED_DATA_PIN, GRB>(leds, NUM_LEDS);
+    FastLED.setBrightness(20);
 
     unsigned status = bmp.begin(BMP280_SENSOR_ADDR);
     if (!status) {
@@ -40,8 +48,24 @@ float roll = 0;
 float pitch = 0;
 float yaw = 0;
 
+float temperature = 0;
+float pressure = 0;  // Pa
+float altitude = 0;  // m
+
+bool is_mode_ascii = true;
+
 void loop(void) {
     M5_UPDATE();
+
+    if (M5.BtnA.wasPressed()) {
+        is_mode_ascii = !is_mode_ascii;
+    }
+    if (is_mode_ascii) {
+        leds[0] = CRGB::Red;
+    } else {
+        leds[0] = CRGB::Green;
+    }
+    FastLED.show();
 
     // put your main code here, to run repeatedly:
     float x, y, z;
@@ -60,48 +84,23 @@ void loop(void) {
         pitch = filter.getPitch();
         yaw = filter.getYaw();
 
-        Serial.printf("roll:%.2f, pitch:%.2f, yaw:%.2f\r\n", roll, pitch, yaw);
+        temperature = bmp.readTemperature();
+        pressure = bmp.readPressure();
+        altitude = bmp.readAltitude(1013.25);
 
-        /*
-        Serial.print("accel: \t");
-        Serial.print(ax);
-        Serial.print('\t');
-        Serial.print(ay);
-        Serial.print('\t');
-        Serial.print(az);
-        Serial.println();
-
-        Serial.print("gyro: \t");
-        Serial.print(gx);
-        Serial.print('\t');
-        Serial.print(gy);
-        Serial.print('\t');
-        Serial.print(gz);
-        Serial.println();
-
-        Serial.print("mag: \t");
-        Serial.print(mx);
-        Serial.print('\t');
-        Serial.print(my);
-        Serial.print('\t');
-        Serial.print(mz);
-        Serial.println();
-        */
+        if (is_mode_ascii) {
+            Serial.printf("roll:%.2f, pitch:%.2f, yaw:%.2f\r\n", roll, pitch,
+                          yaw);
+            Serial.printf("ax:%.2f, ay:%.2f, az:%.2f\r\n", ax, ay, az);
+            Serial.printf("gx:%.2f, gy:%.2f, gz:%.2f\r\n", gx, gy, gz);
+            Serial.printf("mx:%.2f, my:%.2f, mz:%.2f\r\n", mx, my, mz);
+            Serial.printf("temperature:%.2f C\r\n", temperature);
+            Serial.printf("pressure:%.2f hPa\r\n", pressure * 0.01);
+            Serial.printf("altitude:%.2f m\r\n", altitude);
+        } else {
+            // Serial.printf("%.2f,%.2f,%.2f\r\n", roll, pitch, yaw);
+        }
     }
 
-    /*
-    Serial.print(F("Temperature = "));
-    Serial.print(bmp.readTemperature());
-    Serial.println(" *C");
-
-    Serial.print(F("Pressure = "));
-    Serial.print(bmp.readPressure());
-    Serial.println(" Pa");
-
-    Serial.print(F("Approx altitude = "));
-    Serial.print(bmp.readAltitude(1013.25)); // Adjusted to local forecast!
-    Serial.println(" m");
-    Serial.println();
-    */
     delay(10);
 }
