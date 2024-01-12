@@ -16,7 +16,7 @@
 #define NUM_LEDS     1
 #define LED_DATA_PIN 35
 
-CRGB leds[NUM_LEDS];
+//CRGB leds[NUM_LEDS];
 
 Madgwick filter;
 
@@ -50,13 +50,13 @@ void task_main(void *pvParameters) {
             is_mode_ascii = !is_mode_ascii;
         }
         if (is_mode_ascii) {
-            leds[0] = CRGB::Red;
+            //leds[0] = CRGB::Red;
             send_data.cmd_type = 0;
         } else {
-            leds[0] = CRGB::Green;
+            //leds[0] = CRGB::Green;
             send_data.cmd_type = 1;
         }
-        FastLED.show();
+        //FastLED.show();
 
         // put your main code here, to run repeatedly:
         float x, y, z;
@@ -110,6 +110,14 @@ void task_main(void *pvParameters) {
             }
         }
 
+        M5.Lcd.clear(BLACK);
+        M5.Lcd.setTextColor(WHITE, BLACK);
+        M5.Lcd.setTextSize(1.5);
+        M5.Lcd.setCursor(0, 0);
+        M5.Lcd.println("M5 IMU");
+        M5.Lcd.setCursor(0, 20);
+        M5.Lcd.println("ascii mode: " + String(is_mode_ascii));
+
         vTaskDelay(periodic_time / portTICK_PERIOD_MS);
     }
 }
@@ -162,8 +170,15 @@ void setup(void) {
 
     M5_BEGIN(cfg);
 
-    FastLED.addLeds<WS2811, LED_DATA_PIN, GRB>(leds, NUM_LEDS);
-    FastLED.setBrightness(20);
+    //FastLED.addLeds<WS2811, LED_DATA_PIN, GRB>(leds, NUM_LEDS);
+    //FastLED.setBrightness(20);
+
+    M5.Lcd.setRotation(2);
+    M5.Lcd.fillScreen(BLACK);
+    M5.Lcd.setTextColor(WHITE, BLACK);
+    M5.Lcd.setTextSize(1.5);
+    M5.Lcd.setCursor(0, 0);
+    M5.Lcd.println("M5 IMU PRO");
 
     unsigned status = bmp.begin(BMP280_SENSOR_ADDR);
     if (!status) {
