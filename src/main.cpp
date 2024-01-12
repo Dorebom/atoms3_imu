@@ -110,21 +110,27 @@ void task_main(void *pvParameters) {
             }
         }
 
+        /*
         M5.Lcd.clear(BLACK);
         M5.Lcd.setTextColor(WHITE, BLACK);
         M5.Lcd.setTextSize(1.5);
         M5.Lcd.setCursor(0, 0);
         M5.Lcd.println("M5 IMU");
         M5.Lcd.setCursor(0, 20);
-        M5.Lcd.println("ascii mode: " + String(is_mode_ascii));
-
+        M5.Lcd.printf("roll:%.2f, pitch:%.2f, yaw:%.2f\r\n", roll, pitch, yaw);
+        //M5.Lcd.println("ascii mode: " + String(is_mode_ascii));
+        */
         vTaskDelay(periodic_time / portTICK_PERIOD_MS);
     }
+    M5.Lcd.setCursor(0, 20);
+    M5.Lcd.println("MAIN DONE");
 }
 
 void task_comm(void *pvParameters) {
     SerialManager serial_manager;
     st_recv_data recv_data;
+    M5.Lcd.setCursor(0, 40);
+    M5.Lcd.println("COMM START");
     for (;;) {
         if (!is_mode_ascii and is_send_binary_data) {
             // send
@@ -172,13 +178,16 @@ void setup(void) {
 
     //FastLED.addLeds<WS2811, LED_DATA_PIN, GRB>(leds, NUM_LEDS);
     //FastLED.setBrightness(20);
+    int cnt = 0;
 
     M5.Lcd.setRotation(2);
     M5.Lcd.fillScreen(BLACK);
     M5.Lcd.setTextColor(WHITE, BLACK);
     M5.Lcd.setTextSize(1.5);
     M5.Lcd.setCursor(0, 0);
-    M5.Lcd.println("M5 IMU PRO");
+    M5.Lcd.println("M5 IMU");
+
+    delay(1000);
 
     unsigned status = bmp.begin(BMP280_SENSOR_ADDR);
     if (!status) {
@@ -187,19 +196,35 @@ void setup(void) {
               "try a different address!"));
         Serial.print("SensorID was: 0x");
         Serial.println(bmp.sensorID(), 16);
-        while (1) delay(10);
+        M5.Lcd.setCursor(0, 20);
+        M5.Lcd.println("SETUP ---");
+        while (1) {
+            M5.Lcd.setCursor(0, 40);
+            M5.Lcd.println(cnt++);
+            delay(10);
+            M5.Lcd.clear(BLACK);
+        }
+        M5.Lcd.setCursor(0, 40);
+        M5.Lcd.println("SETUP OK");
     }
 
     bmi270.init(I2C_NUM_0, BIM270_SENSOR_ADDR);
     filter.begin(100);  // 20hz
     filter.setGain(10.0f);
 
+    M5.Lcd.setCursor(0, 20);
+    M5.Lcd.println("SETUP START");
     // xTaskCreate(task_main, "task_main", 4096, NULL, 2, &taskHandle[0]);
     xTaskCreatePinnedToCore(task_main, "task_main", 4096, NULL, 2,
                             &taskHandle[0], 1);
     xTaskCreatePinnedToCore(task_comm, "task_comm", 4096, NULL, 2,
                             &taskHandle[1], 0);
+    M5.Lcd.setCursor(0, 40);
+    M5.Lcd.println("SETUP DONE");
 }
 
 void loop(void) {
+    M5.Lcd.setCursor(0, 60);
+    M5.Lcd.println("LOOP");
+
 }
