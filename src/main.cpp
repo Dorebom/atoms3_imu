@@ -123,8 +123,13 @@ void task_comm(void *pvParameters) {
             system_manager.send_serial(send_data);
         }
 
+        M5.Lcd.fillScreen(BLACK);
         // recv
         if (system_manager.recv_serial(recv_data)) {
+            M5.Lcd.setCursor(0, 20);
+            M5.Lcd.printf("RECEIVE!\r\n");
+            M5.Lcd.setCursor(0, 40);
+            M5.Lcd.printf("timestamp:%.2f\r\n", recv_data.timestamp);
             if (recv_data.timestamp - timestamp > 0.0) {
                 timestamp = recv_data.timestamp;
 
@@ -164,6 +169,13 @@ void setup(void) {
 
     FastLED.addLeds<WS2811, LED_DATA_PIN, GRB>(leds, NUM_LEDS);
     FastLED.setBrightness(20);
+
+    M5.Lcd.setRotation(2);
+    M5.Lcd.fillScreen(BLACK);
+    M5.Lcd.setTextColor(WHITE);
+    M5.Lcd.setTextSize(2);
+    M5.Lcd.setCursor(0, 0);
+    M5.Lcd.println("Hello!");
 
     unsigned status = bmp.begin(BMP280_SENSOR_ADDR);
     if (!status) {

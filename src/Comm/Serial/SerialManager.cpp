@@ -25,6 +25,9 @@ void SerialManager::recv(uint8_t *data, int data_size) {
     if (Serial.available() == true) {
         Serial.read(encoded_buffer, encode_buffer_size);
         encoding_.decode(encoded_buffer, encode_buffer_size, data);
+    } else {
+        M5.Lcd.setCursor(0, 80);
+        M5.Lcd.printf("recv: %d\n", encode_buffer_size);
     }
     /*
     if (USBSerial.available() == true) {
